@@ -25,15 +25,19 @@ jobs:
       shell: powershell
 
     # 3️⃣ Run installed program (example)
-    - name: Run installed application
+    - name: Find installed EXE safely
       run: |
-        $exePath = Get-ChildItem -Recurse "C:\Program Files" -Filter *.exe
-        if (Test-Path $exePath) {
-            Start-Process -FilePath $exePath -ArgumentList "--version" -Wait
+        $exePath = Get-ChildItem "C:\Program Files" -Recurse -Filter *.exe -ErrorAction SilentlyContinue
+    
+        if ($exePath) {
+            $firstExe = $exePath[0].FullName
+            Write-Output "Found EXE at: $firstExe"
+            Start-Process -FilePath $firstExe -ArgumentList "--version" -Wait
         } else {
             Write-Error "Executable not found!"
         }
       shell: powershell
+
 
     # 4️⃣ Upload generated files as artifact
     - name: Upload output files
