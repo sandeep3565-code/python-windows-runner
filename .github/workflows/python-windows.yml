@@ -27,7 +27,7 @@ jobs:
     # 3️⃣ Run installed program (example)
     - name: Run installed application
       run: |
-        $exePath = "C:\Program Files\YourSoftwareFolder\yourprogram.exe"
+        $exePath = Get-ChildItem -Recurse "C:\Program Files" -Filter *.exe
         if (Test-Path $exePath) {
             Start-Process -FilePath $exePath -ArgumentList "--version" -Wait
         } else {
