@@ -1,4 +1,4 @@
-name: Install EXE on Windows
+name: Install and Run EXE
 
 on:
   workflow_dispatch:
@@ -8,13 +8,38 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: List files
-      run: dir
-
+    # 1️⃣ Install the EXE
     - name: Install EXE silently
       run: |
         Start-Process -FilePath ".\pg4uwarc-ondemand.exe" -ArgumentList "/silent" -Wait
       shell: powershell
+
+    # 2️⃣ Verify installation path
+    - name: Verify installation directory
+      run: |
+        Write-Output "Checking Program Files..."
+        Get-ChildItem "C:\Program Files" | Select-Object Name
+      shell: powershell
+
+    # 3️⃣ Run installed program (example)
+    - name: Run installed application
+      run: |
+        $exePath = "C:\Program Files\YourSoftwareFolder\yourprogram.exe"
+        if (Test-Path $exePath) {
+            Start-Process -FilePath $exePath -ArgumentList "--version" -Wait
+        } else {
+            Write-Error "Executable not found!"
+        }
+      shell: powershell
+
+    # 4️⃣ Upload generated files as artifact
+    - name: Upload output files
+      uses: actions/upload-artifact@v4
+      with:
+        name: generated-files
+        path: |
+          output/
+          *.log
