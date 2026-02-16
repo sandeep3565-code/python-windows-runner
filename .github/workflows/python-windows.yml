@@ -46,11 +46,9 @@ jobs:
       shell: powershell
 
     # 5️⃣ Upload generated files
-    - name: Upload artifacts
+    - name: Upload saved project
       uses: actions/upload-artifact@v4
       with:
-        name: elnec-output
-        path: |
-          *.hex
-          *.bin
-          *.log
+        name: saved-project
+        path: Test_new_saved.eprj
+
