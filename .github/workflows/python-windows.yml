@@ -1,4 +1,4 @@
-name: Install and Run Elnec CLI
+name: Run Elnec Project via Python
 
 on:
   workflow_dispatch:
@@ -11,45 +11,46 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 1️⃣ Install software
+    # 1️⃣ Install Elnec
     - name: Install Elnec Software
       run: |
         Start-Process -FilePath ".\pg4uwarc-ondemand.exe" -ArgumentList "/silent" -Wait
       shell: powershell
 
-    # 2️⃣ Detect installation path
+    # 2️⃣ Detect EXE path
     - name: Locate pg4uwcmd.exe
-      id: locate
       run: |
         $path32 = "C:\Program Files\Elnec_sw\Programmer\pg4uwcmd.exe"
         $path64 = "C:\Program Files (x86)\Elnec_sw\Programmer\pg4uwcmd.exe"
 
         if (Test-Path $path32) {
-            Write-Output "Found 32-bit version"
-            echo "EXE_PATH=$path32" >> $env:GITHUB_ENV
+            echo "PG4UWCMD=$path32" >> $env:GITHUB_ENV
         }
         elseif (Test-Path $path64) {
-            Write-Output "Found 64-bit version"
-            echo "EXE_PATH=$path64" >> $env:GITHUB_ENV
+            echo "PG4UWCMD=$path64" >> $env:GITHUB_ENV
         }
         else {
             Write-Error "pg4uwcmd.exe not found!"
         }
       shell: powershell
 
-    # 3️⃣ Run CLI tool
-    - name: Run Elnec CLI
-      run: |
-        Write-Output "Running: $env:EXE_PATH"
-        & "$env:EXE_PATH" /?
+    # 3️⃣ Setup Python
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # 4️⃣ Run your Python script
+    - name: Run project automation
+      run: python main.py
       shell: powershell
 
-    # 4️⃣ Upload output files (adjust if needed)
-    - name: Upload output artifacts
+    # 5️⃣ Upload generated files
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: elnec-output
         path: |
-          *.log
           *.hex
           *.bin
+          *.log
